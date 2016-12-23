@@ -134,13 +134,19 @@ var getSelected = function()
 }
 
 var divTextSelectionMenu = document.createElement('div');
-var textTest = document.createElement('input');
+var selMarkDownType = document.createElement('select');
+var optMarkDownH1 = document.createElement('option');
+var textTest = document.createElement('textarea');
 document.body.appendChild(divTextSelectionMenu);
+divTextSelectionMenu.appendChild(selMarkDownType);
+selMarkDownType.appendChild(optMarkDownH1);
 divTextSelectionMenu.appendChild(textTest);
 divTextSelectionMenu.id = "menu";
 divTextSelectionMenu.style = 'display:none;box-shadow: 0px 0px 4px rgba(0,0,0,.5);border: solid 1px #000;position: absolute;background: #fff;';
+selMarkDownType.style.display = "block";
 textTest.type = "text";
 textTest.id = "textTest";
+optMarkDownH1.innerHTML = "h1";
 
 $(document).on("mouseup", function(e) 
 {
