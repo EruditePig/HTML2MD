@@ -133,20 +133,87 @@ var getSelected = function()
     return '';
 }
 
+// 选择文本之后的弹出对话框
 var divTextSelectionMenu = document.createElement('div');
-var selMarkDownType = document.createElement('select');
-var optMarkDownH1 = document.createElement('option');
 var textTest = document.createElement('textarea');
+var btnAddToMarkDown = document.createElement('input');
 document.body.appendChild(divTextSelectionMenu);
-divTextSelectionMenu.appendChild(selMarkDownType);
-selMarkDownType.appendChild(optMarkDownH1);
 divTextSelectionMenu.appendChild(textTest);
 divTextSelectionMenu.id = "menu";
 divTextSelectionMenu.style = 'display:none;box-shadow: 0px 0px 4px rgba(0,0,0,.5);border: solid 1px #000;position: absolute;background: #fff;';
-selMarkDownType.style.display = "block";
 textTest.type = "text";
 textTest.id = "textTest";
+
+// 下拉选择框，选择各种Markdown样式
+var selMarkDownType = document.createElement('select');
+divTextSelectionMenu.appendChild(selMarkDownType);
+selMarkDownType.style.display = "block";
+selMarkDownType.id = "HTML2MD_TypeSelect"
+var optMarkDownTitle = document.createElement('option');
+selMarkDownType.appendChild(optMarkDownTitle);
+optMarkDownTitle.innerHTML = "title";
+var optMarkDownH1 = document.createElement('option');
+selMarkDownType.appendChild(optMarkDownH1);
 optMarkDownH1.innerHTML = "h1";
+var optMarkDownH2 = document.createElement('option');
+selMarkDownType.appendChild(optMarkDownH2);
+optMarkDownH2.innerHTML = "h2";
+var optMarkDownH3 = document.createElement('option');
+selMarkDownType.appendChild(optMarkDownH3);
+optMarkDownH3.innerHTML = "h3";
+var optMarkDownSource = document.createElement('option');
+selMarkDownType.appendChild(optMarkDownSource);
+optMarkDownSource.innerHTML = "src";
+var optMarkDownUl = document.createElement('option');
+selMarkDownType.appendChild(optMarkDownUl);
+optMarkDownUl.innerHTML = "ul";
+var optMarkDownOl = document.createElement('option');
+selMarkDownType.appendChild(optMarkDownOl);
+optMarkDownOl.innerHTML = "ol";
+
+divTextSelectionMenu.appendChild(btnAddToMarkDown);
+btnAddToMarkDown.type = "button";
+btnAddToMarkDown.value = "MD";
+btnAddToMarkDown.onclick = function()
+{
+    var selection = document.getElementById("HTML2MD_TypeSelect");
+    var text = document.getElementById("textTest");
+    if(selection.value == "h1")
+    {
+        addMarkDown("# " + text.value);
+    }
+    else if(selection.value == "h2")
+    {
+        addMarkDown("## " + text.value);
+    }
+    else if(selection.value == "h3")
+    {
+        addMarkDown("### " + text.value);
+    }
+    else if(selection.value == "title")
+    {
+        addMarkDown(text.value + "\r\n====================");
+    }
+    else if(selection.value == "src")
+    {
+        addMarkDown("```c++\r\n" + text.value + "\r\n```");
+    }
+    else if(selection.value == "ul")
+    {
+        addMarkDown("* " + text.value);
+    }
+    else if(selection.value == "ol")
+    {
+        addMarkDown("1. " + text.value);
+    }
+};
+
+function addMarkDown(str)
+{
+    var mdText = document.getElementById("MD2HTML_mdText");
+    mdText.value += "\r\n";
+    mdText.value += str;
+}
 
 $(document).on("mouseup", function(e) 
 {
@@ -163,10 +230,16 @@ $(document).on("mouseup", function(e)
             menu.style.top  = e.pageY + 5;
         }
     }
-    else
+});
+
+
+$(document).on("mousedown", function(e) 
+{
+    var menu = document.getElementById("menu");
+    if(menu.style.display == "block")
     {
-        var rect = menu.getBoundingClientRect();
-        if(e.pageX < rect.left || rect.right < e.pageX || e.pageY < rect.top || rect.bottom < e.pageY )
+        var ele = document.elementFromPoint(e.pageX, e.pageY);
+        if(!$.contains(menu, ele))
         {
             menu.style.display = 'none';
         }
