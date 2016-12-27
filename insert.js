@@ -14,13 +14,12 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     var dialogtitle = document.createElement("span");
     var dialogclose = document.createElement("span");
     var closeaction = document.createElement("button");
-    /*为窗口设置一个id，id如此怪异是为了尽量避免与其他用户取的id相同而出错*/
     dialog.id = dlgID;
     /*组装对话框标题栏,按从里到外的顺序组装*/
     dialogtitle.innerHTML = title;
     dialogtitlebar.appendChild(dialogtitle);
     dialogtitlebar.appendChild(dialogclose);
-    closeaction.innerHTML = "╳";
+    closeaction.innerHTML = "×";
     dialogclose.appendChild(closeaction);
     /*组装对话框主体内容*/
     if(bodycontent!=null)
@@ -85,42 +84,53 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     }
 }
 
-
-// 各个元素
-var bodyContent = document.createElement('div');
-var btnConv = document.createElement('input');
-var divMDdEditor = document.createElement('div');
-var textmdEditor = document.createElement('textarea');
-var divHTMLDisp = document.createElement('div')
-var frameHTMLDisp = document.createElement('iframe');
-// 组装起来
-bodyContent.appendChild(btnConv);
-bodyContent.appendChild(divMDdEditor);
-bodyContent.appendChild(divHTMLDisp);
-divMDdEditor.appendChild(textmdEditor);
-divHTMLDisp.appendChild(frameHTMLDisp);
-// 各个元素配置
-btnConv.type = "button";
-btnConv.value = "Run";
-btnConv.onclick = function()
+// 创建悬浮对话框
+function createHTML2MardDownDialog()
 {
-    var converter = new showdown.Converter();
-    var text      = document.getElementById("MD2HTML_mdText").value;
-    var html      = converter.makeHtml(text);
-    document.getElementById("MD2HTML_HTMLFrame").srcdoc = html;
-};
-divMDdEditor.style = "width: 50%; height: 500px; float: left; border: 1px solid #333; border-right: 0px; box-sizing: border-box;";
-textmdEditor.style = "width: 100%; height: 100%; border: 0px; padding: 5px; box-sizing: border-box;";
-textmdEditor.id = "MD2HTML_mdText";
-divHTMLDisp.style="width: 50%; height: 500px; float: right; border: 1px solid #333; box-sizing: border-box;";
-frameHTMLDisp.style="width: 100%; height: 100%; border: 0px; padding: 5px; box-sizing: border-box;";
-frameHTMLDisp.id = "MD2HTML_HTMLFrame";
-// 创建对话框
-createdialog("Html2MD",400,400,bodyContent,"Html2MD",true);
+    // 各个元素
+    var bodyContent = document.createElement('div');    // 对话框最外div
+    bodyContent.id = 'HTML2MD_Dialog';
+    {   // 工具栏
+        var divToolBar = document.createElement('div');
+        bodyContent.appendChild(divToolBar);
+        var btnConv = document.createElement('input');      // HTML2MD按钮
+        divToolBar.appendChild(btnConv);
+        btnConv.type = "button";
+        btnConv.value = "Run";
+        btnConv.onclick = function()
+        {
+            var converter = new showdown.Converter();
+            var text      = document.getElementById("MD2HTML_mdText").value;
+            var html      = converter.makeHtml(text);
+            document.getElementById("MD2HTML_HTMLFrame").srcdoc = html;
+        };
+    }
+    {   // MarkDown编辑框
+        var divMDdEditor = document.createElement('div');
+        bodyContent.appendChild(divMDdEditor);
+        divMDdEditor.style = "width: 50%; height: 500px; float: left; border: 1px solid #333; border-right: 0px; box-sizing: border-box;";
+        var textmdEditor = document.createElement('textarea');
+        divMDdEditor.appendChild(textmdEditor);
+        textmdEditor.style = "width: 100%; height: 100%; border: 0px; padding: 5px; box-sizing: border-box;";
+        textmdEditor.id = "MD2HTML_mdText";
+    }
+    { // html展示框
+        var divHTMLDisp = document.createElement('div')
+        bodyContent.appendChild(divHTMLDisp);
+        divHTMLDisp.style="width: 50%; height: 500px; float: right; border: 1px solid #333; box-sizing: border-box;";
+        var frameHTMLDisp = document.createElement('iframe');
+        divHTMLDisp.appendChild(frameHTMLDisp);
+        frameHTMLDisp.style="width: 100%; height: 100%; border: 0px; padding: 5px; box-sizing: border-box;";
+        frameHTMLDisp.id = "MD2HTML_HTMLFrame";
+    }
+    // 创建对话框
+    createdialog("Html2MD",400,400,bodyContent,"Html2MD",true);
+    
+}
 
 
 // 选择文本对话框
-var getSelected = function() 
+function getSelected() 
 {
     if (window.getSelection) 
     { //如果是Firefox、Chrome、Safari、Opera
@@ -133,98 +143,117 @@ var getSelected = function()
     return '';
 }
 
+
 // 选择文本之后的弹出对话框
-var divTextSelectionMenu = document.createElement('div');
-var textTest = document.createElement('textarea');
-var btnAddToMarkDown = document.createElement('input');
-document.body.appendChild(divTextSelectionMenu);
-divTextSelectionMenu.appendChild(textTest);
-divTextSelectionMenu.id = "menu";
-divTextSelectionMenu.style = 'display:none;box-shadow: 0px 0px 4px rgba(0,0,0,.5);border: solid 1px #000;position: absolute;background: #fff;';
-textTest.type = "text";
-textTest.id = "textTest";
-
-// 下拉选择框，选择各种Markdown样式
-var selMarkDownType = document.createElement('select');
-divTextSelectionMenu.appendChild(selMarkDownType);
-selMarkDownType.style.display = "block";
-selMarkDownType.id = "HTML2MD_TypeSelect"
-var optMarkDownTitle = document.createElement('option');
-selMarkDownType.appendChild(optMarkDownTitle);
-optMarkDownTitle.innerHTML = "title";
-var optMarkDownH1 = document.createElement('option');
-selMarkDownType.appendChild(optMarkDownH1);
-optMarkDownH1.innerHTML = "h1";
-var optMarkDownH2 = document.createElement('option');
-selMarkDownType.appendChild(optMarkDownH2);
-optMarkDownH2.innerHTML = "h2";
-var optMarkDownH3 = document.createElement('option');
-selMarkDownType.appendChild(optMarkDownH3);
-optMarkDownH3.innerHTML = "h3";
-var optMarkDownSource = document.createElement('option');
-selMarkDownType.appendChild(optMarkDownSource);
-optMarkDownSource.innerHTML = "src";
-var optMarkDownUl = document.createElement('option');
-selMarkDownType.appendChild(optMarkDownUl);
-optMarkDownUl.innerHTML = "ul";
-var optMarkDownOl = document.createElement('option');
-selMarkDownType.appendChild(optMarkDownOl);
-optMarkDownOl.innerHTML = "ol";
-
-divTextSelectionMenu.appendChild(btnAddToMarkDown);
-btnAddToMarkDown.type = "button";
-btnAddToMarkDown.value = "MD";
-btnAddToMarkDown.onclick = function()
+function createSelectionContextDialog()
 {
-    var selection = document.getElementById("HTML2MD_TypeSelect");
-    var text = document.getElementById("textTest");
-    if(selection.value == "h1")
-    {
-        addMarkDown("# " + text.value);
+    var divTextSelectionMenu = document.createElement('div');
+    document.body.appendChild(divTextSelectionMenu);
+    divTextSelectionMenu.id = "menu";
+    divTextSelectionMenu.style = 'display:none;box-shadow: 0px 0px 4px rgba(0,0,0,.5);border: solid 1px #000;position: absolute;background: #fff;';
+    {   // 工具栏
+        var divToolBar = document.createElement('div');
+        divTextSelectionMenu.appendChild(divToolBar);
+        // 下拉选择框，选择各种Markdown样式
+        var selMarkDownType = document.createElement('select');
+        divToolBar.appendChild(selMarkDownType);
+        selMarkDownType.style.display = "inline-block";
+        selMarkDownType.id = "HTML2MD_TypeSelect"
+        var optMarkDownTitle = document.createElement('option');
+        selMarkDownType.appendChild(optMarkDownTitle);
+        optMarkDownTitle.innerHTML = "title";
+        var optMarkDownH1 = document.createElement('option');
+        selMarkDownType.appendChild(optMarkDownH1);
+        optMarkDownH1.innerHTML = "h1";
+        var optMarkDownH2 = document.createElement('option');
+        selMarkDownType.appendChild(optMarkDownH2);
+        optMarkDownH2.innerHTML = "h2";
+        var optMarkDownH3 = document.createElement('option');
+        selMarkDownType.appendChild(optMarkDownH3);
+        optMarkDownH3.innerHTML = "h3";
+        var optMarkDownSource = document.createElement('option');
+        selMarkDownType.appendChild(optMarkDownSource);
+        optMarkDownSource.innerHTML = "src";
+        var optMarkDownUl = document.createElement('option');
+        selMarkDownType.appendChild(optMarkDownUl);
+        optMarkDownUl.innerHTML = "ul";
+        var optMarkDownOl = document.createElement('option');
+        selMarkDownType.appendChild(optMarkDownOl);
+        optMarkDownOl.innerHTML = "ol";
+        // 生成MarkDown文本按钮
+        var btnAddToMarkDown = document.createElement('input');
+        divToolBar.appendChild(btnAddToMarkDown);
+        btnAddToMarkDown.type = "button";
+        btnAddToMarkDown.value = "MD";
+        btnAddToMarkDown.onclick = function()
+        {
+            var addMarkDown = function(str)
+            {
+                var mdText = document.getElementById("MD2HTML_mdText");
+                mdText.value += "\r\n";
+                mdText.value += str;
+            };
+            var selection = document.getElementById("HTML2MD_TypeSelect");
+            var text = document.getElementById("textEdit");
+            if(selection.value == "h1")
+            {
+                addMarkDown("# " + text.value);
+            }
+            else if(selection.value == "h2")
+            {
+                addMarkDown("## " + text.value);
+            }
+            else if(selection.value == "h3")
+            {
+                addMarkDown("### " + text.value);
+            }
+            else if(selection.value == "title")
+            {
+                addMarkDown(text.value + "\r\n====================");
+            }
+            else if(selection.value == "src")
+            {
+                addMarkDown("```c++\r\n" + text.value + "\r\n```");
+            }
+            else if(selection.value == "ul")
+            {
+                addMarkDown("* " + text.value);
+            }
+            else if(selection.value == "ol")
+            {
+                addMarkDown("1. " + text.value);
+            }
+        };
     }
-    else if(selection.value == "h2")
-    {
-        addMarkDown("## " + text.value);
+    {   // 文本编辑
+        var textEdit = document.createElement('textarea');
+        divTextSelectionMenu.appendChild(textEdit);
+        textEdit.type = "text";
+        textEdit.id = "textEdit";
     }
-    else if(selection.value == "h3")
-    {
-        addMarkDown("### " + text.value);
-    }
-    else if(selection.value == "title")
-    {
-        addMarkDown(text.value + "\r\n====================");
-    }
-    else if(selection.value == "src")
-    {
-        addMarkDown("```c++\r\n" + text.value + "\r\n```");
-    }
-    else if(selection.value == "ul")
-    {
-        addMarkDown("* " + text.value);
-    }
-    else if(selection.value == "ol")
-    {
-        addMarkDown("1. " + text.value);
-    }
-};
-
-function addMarkDown(str)
-{
-    var mdText = document.getElementById("MD2HTML_mdText");
-    mdText.value += "\r\n";
-    mdText.value += str;
+    
 }
+
+function HTML2MarkDownMain()
+{
+    createHTML2MardDownDialog();
+    createSelectionContextDialog();
+}
+
+HTML2MarkDownMain();
 
 $(document).on("mouseup", function(e) 
 {
+    var dialog = document.getElementById("Html2MD");
     var menu = document.getElementById("menu");
-    if(menu.style.display == "" || menu.style.display == "none")
+    var ele = document.elementFromPoint(e.pageX, e.pageY);
+    if(!$.contains(dialog, ele) && (menu.style.display == "" || menu.style.display == "none"))
     {
         var selectedText = getSelected();
         if(selectedText != '')
         {
-            var textTest = document.getElementById('textTest');
-            textTest.value = selectedText;
+            var textEdit = document.getElementById('textEdit');
+            textEdit.value = selectedText;
             menu.style.display = 'block';
             menu.style.left = e.pageX + 5;
             menu.style.top  = e.pageY + 5;
