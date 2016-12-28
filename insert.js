@@ -36,7 +36,7 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     templeft = (document.body.clientWidth-width)/2;
     temptop = (document.body.clientHeight-height)/2;
     tempheight= height-30;
-    dialogcssText= "position:absolute;background:#65c294;padding:1px;border:4px;top:"+temptop+"px;left:"+templeft+"px;height:"+height+"px;width:"+width+"px;";
+    dialogcssText= "position:fixed;background:#65c294;z-index:1000;padding:1px;border:4px;top:100px;right:100px;height:"+height+"px;width:"+width+"px;";
     dialogbodycssText = "width:100%;background:#ffffff;"+"height:" + tempheight + "px;";
     dialog.style.cssText = dialogcssText;
     dialogtitlebar.style.cssText = "height:30px;width:100%;cursor:move;";
@@ -58,29 +58,30 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
         var ismousedown = false;
         var dialogleft,dialogtop;
         var downX,downY;
-        dialogleft = parseInt(dialog.style.left);
+        dialogright = parseInt(dialog.style.right);
         dialogtop = parseInt(dialog.style.top);
-        dialogtitlebar.onmousedown = function(e)
+        dialogtitlebar.addEventListener("mousedown",function(e)
         {
             ismousedown = true;
             downX = e.clientX;
             downY = e.clientY;
-        }
-        document.onmousemove = function(e)
+        });
+        document.addEventListener("mousemove", function(e)
         {
             if(ismousedown)
             {
                 dialog.style.top = e.clientY - downY + dialogtop + "px";
-                dialog.style.left = e.clientX - downX + dialogleft + "px";
+                dialog.style.right = downX - e.clientX + dialogright + "px";
+                console.log(e.clientX, downX, dialogright);
             }
-        }
+        });
         /*松开鼠标时要重新计算当前窗口的位置*/
-        document.onmouseup = function()
+        document.addEventListener("mouseup", function()
         {
-            dialogleft = parseInt(dialog.style.left);
+            dialogright = parseInt(dialog.style.right);
             dialogtop = parseInt(dialog.style.top);
             ismousedown = false;
-        }
+        });
     }
 }
 
@@ -150,7 +151,7 @@ function createSelectionContextDialog()
     var divTextSelectionMenu = document.createElement('div');
     document.body.appendChild(divTextSelectionMenu);
     divTextSelectionMenu.id = "menu";
-    divTextSelectionMenu.style = 'display:none;box-shadow: 0px 0px 4px rgba(0,0,0,.5);border: solid 1px #000;position: absolute;background: #fff;';
+    divTextSelectionMenu.style = 'display:none;z-index:1000;box-shadow: 0px 0px 4px rgba(0,0,0,.5);border: solid 1px #000;position: absolute;background: #fff;';
     {   // 工具栏
         var divToolBar = document.createElement('div');
         divTextSelectionMenu.appendChild(divToolBar);
@@ -246,7 +247,7 @@ $(document).on("mouseup", function(e)
 {
     var dialog = document.getElementById("Html2MD");
     var menu = document.getElementById("menu");
-    var ele = document.elementFromPoint(e.pageX, e.pageY);
+    var ele = document.elementFromPoint(e.clientX, e.clientY);
     if(!$.contains(dialog, ele) && (menu.style.display == "" || menu.style.display == "none"))
     {
         var selectedText = getSelected();
@@ -255,8 +256,8 @@ $(document).on("mouseup", function(e)
             var textEdit = document.getElementById('textEdit');
             textEdit.value = selectedText;
             menu.style.display = 'block';
-            menu.style.left = e.pageX + 5;
-            menu.style.top  = e.pageY + 5;
+            menu.style.left = e.pageX + 5 + "px";
+            menu.style.top  = e.pageY + 5 + "px";
         }
     }
 });
@@ -267,7 +268,7 @@ $(document).on("mousedown", function(e)
     var menu = document.getElementById("menu");
     if(menu.style.display == "block")
     {
-        var ele = document.elementFromPoint(e.pageX, e.pageY);
+        var ele = document.elementFromPoint(e.clientX, e.clientY);
         if(!$.contains(menu, ele))
         {
             menu.style.display = 'none';
