@@ -10,6 +10,8 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     var edgeWidth = 5;
     var titleHeight = 20;
     var edgeZIndex = 3;
+    var dragObj = {"state":false, "timerId":0, "nowPt":{}, "para":{}};
+    
     // 最外围的div
     var dialog = document.createElement("div");
     document.body.appendChild(dialog);
@@ -23,6 +25,20 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     dialog.style.height = height+"px";
     dialog.style.width = width+"px";
     
+    // 边框拖拽响应函数
+    document.addEventListener("mouseup", function(e)
+    {
+        dragObj.state = false;
+        clearInterval(dragObj.timerId);
+        console.log("up", dragObj);
+    });
+    document.addEventListener("mousemove", function(e)
+    {
+        if(dragObj.state == true)
+        {
+            dragObj.nowPt = {"x":e.clientX, "y":e.clientY};
+        }
+    });
     // 上边框
     var topEdge = document.createElement("div");
     dialog.appendChild(topEdge);
@@ -32,7 +48,24 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     topEdge.style.top = "0px";
     topEdge.style.background = "red";
     topEdge.style.zIndex = edgeZIndex;
-    
+    topEdge.addEventListener("mousedown", function(e)
+    {
+        dragObj.state = true;
+        dragObj.para = {"top":parseInt(dialog.style.top), "height":parseInt(dialog.style.height), "y" : e.clientY};
+        dragObj.timerId = setInterval(function()
+        {
+            if(dragObj.state = true)
+            {
+                dialog.style.top = dragObj.nowPt.y - dragObj.para.y + dragObj.para.top + "px";
+                dialog.style.height = dragObj.para.height - (dragObj.nowPt.y - dragObj.para.y) + "px";
+            }
+        }, 10);
+        
+    });
+    topEdge.addEventListener("mouseover", function(e)
+    {
+        topEdge.style.cursor = "n-resize";
+    });
     // 左边框
     var leftEdge = document.createElement("div");
     dialog.appendChild(leftEdge);
