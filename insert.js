@@ -6,93 +6,152 @@
 *注意：内容窗体的高度是height-30px，请计算好你要显示的内容的高度和宽度。弹出窗的id为"223238909"，所以你的页面不要再取值为"223238909"的id了，以防js执行出错*/
 function createdialog(dlgID,width,height,bodycontent,title,removeable)
 {
-    /*创建窗口的组成元素*/
+    // 一些控制变量
+    var edgeWidth = 5;
+    var titleHeight = 20;
+    var edgeZIndex = 3;
+    // 最外围的div
     var dialog = document.createElement("div");
     document.body.appendChild(dialog);
-    var dialogtitlebar= document.createElement("div");
-    var dialogbody = document.createElement("div");
-    var dialogtitle = document.createElement("span");
-    var dialogclose = document.createElement("span");
-    var closeaction = document.createElement("button");
     dialog.id = dlgID;
-    /*组装对话框标题栏,按从里到外的顺序组装*/
-    dialogtitle.innerHTML = title;
+    dialog.style.position = "fixed";
+    //dialog.style.background = "blue";
+    //dialog.style.padding = "1px";
+    dialog.style.border = "4px";
+    dialog.style.top = (document.body.clientHeight-height)/2 + "px";
+    dialog.style.left = (document.body.clientWidth-width)/2 + "px";
+    dialog.style.height = height+"px";
+    dialog.style.width = width+"px";
+    
+    // 上边框
+    var topEdge = document.createElement("div");
+    dialog.appendChild(topEdge);
+    topEdge.style.position = "absolute";
+    topEdge.style.height = edgeWidth + "px";
+    topEdge.style.width = "100%";
+    topEdge.style.top = "0px";
+    topEdge.style.background = "red";
+    topEdge.style.zIndex = edgeZIndex;
+    
+    // 左边框
+    var leftEdge = document.createElement("div");
+    dialog.appendChild(leftEdge);
+    leftEdge.style.position = "absolute";
+    leftEdge.style.height = "100%";
+    leftEdge.style.width = edgeWidth + "px";
+    leftEdge.style.left = "0px";
+    leftEdge.style.background = "black";
+    leftEdge.style.zIndex = edgeZIndex;
+    
+    // 右边框
+    var rightEdge = document.createElement("div");
+    dialog.appendChild(rightEdge);
+    rightEdge.style.position = "absolute";
+    rightEdge.style.height = "100%";
+    rightEdge.style.width = edgeWidth + "px";
+    rightEdge.style.right = "0px";
+    rightEdge.style.background = "yellow";
+    rightEdge.style.zIndex = edgeZIndex;
+    
+    // 底边框
+    var btmEdge = document.createElement("div");
+    dialog.appendChild(btmEdge);
+    btmEdge.style.position = "absolute";
+    btmEdge.style.height = edgeWidth + "px";
+    btmEdge.style.width = "100%";
+    btmEdge.style.bottom = "0px";
+    btmEdge.style.background = "orange";
+    btmEdge.style.zIndex = edgeZIndex;
+    
+    /*标题栏*/
+    var dialogtitlebar= document.createElement("div");
+    dialog.appendChild(dialogtitlebar);
+    dialogtitlebar.style.position = "absolute";
+    dialogtitlebar.style.top = "0px";
+    dialogtitlebar.style.height = titleHeight + "px";
+    dialogtitlebar.style.left = "0px";
+    dialogtitlebar.style.right = "0px";
+    dialogtitlebar.style.cursor = "move";
+    dialogtitlebar.style.background = "green"
+    var dialogtitle = document.createElement("span");
+    var dialogclose = document.createElement("button");
     dialogtitlebar.appendChild(dialogtitle);
     dialogtitlebar.appendChild(dialogclose);
-    closeaction.innerHTML = "×";
-    dialogclose.appendChild(closeaction);
-    /*组装对话框主体内容*/
+    dialogtitle.innerHTML = title;
+    dialogclose.innerHTML = "×";
+    dialogclose.style.float = "right";
+    dialogclose.style.display = "block";
+    dialogclose.style.height = "20px";
+    dialogclose.style.width = "20px";
+    dialogclose.style.padding = "0px";
+    dialogclose.style.cursor = "pointer";
+    dialogclose.addEventListener("click", function()
+    {
+       dialog.parentNode.removeChild(dialog);
+    });
+    
+    /*实现窗口的移动，这段代码很典型，网上很多类似的代码*/
+    if(removeable == true)
+    {
+        var ismousedown = false;
+        var dx, dy;
+        dialogtitlebar.addEventListener("mousedown",function(e)
+        {
+            ismousedown = true;
+            dx = parseInt(dialog.style.left) - e.clientX;
+            dy = parseInt(dialog.style.top) - e.clientY;
+        });
+        document.addEventListener("mousemove", function(e)
+        {
+            if(ismousedown)
+            {
+                dialog.style.top = e.clientY + dy + "px";
+                dialog.style.left = e.clientX + dx + "px";
+            }
+        });
+        /*松开鼠标时要重新计算当前窗口的位置*/
+        document.addEventListener("mouseup" , function()
+        {
+            ismousedown = false;
+        });
+    }
+    
+    // 对话框主体
+    var dialogbody = document.createElement("div");
+    dialog.appendChild(dialogbody);
+    dialogbody.style.position = "absolute";
+    dialogbody.style.top = titleHeight + "px";
+    dialogbody.style.bottom = "0px";
+    dialogbody.style.left = "0px";
+    dialogbody.style.right = "0px";
+    dialogbody.style.background = "brown";
+    
     if(bodycontent!=null)
     {
         bodycontent.style.display = "block";
         dialogbody.appendChild(bodycontent);
     }
-    /*组装成完整的对话框*/
-    dialog.appendChild(dialogtitlebar);
-    dialog.appendChild(dialogbody);
-    /*设置窗口组成元素的样式*/
-    var templeft,temptop,tempheight//窗口的位置（将窗口放在页面中间的辅助变量）
-    var dialogcssText,dialogbodycssText;//拼出dialog和dialogbody的样式字符串
-    templeft = (document.body.clientWidth-width)/2;
-    temptop = (document.body.clientHeight-height)/2;
-    tempheight= height-30;
-    dialogcssText= "position:absolute;background:#65c294;padding:1px;border:4px;top:"+temptop+"px;left:"+templeft+"px;height:"+height+"px;width:"+width+"px;";
-    dialogbodycssText = "width:100%;background:#ffffff;"+"height:" + tempheight + "px;";
-    dialog.style.cssText = dialogcssText;
-    dialogtitlebar.style.cssText = "height:30px;width:100%;cursor:move;";
-    dialogbody.style.cssText 	= dialogbodycssText;
-    dialogclose.style.cssText 	= "float:right;display:block;margin:4px;line-height:20px;";
-    closeaction.style.cssText	= "height:20px;width:24px;border-width:1px;cursor:pointer;";
-    /*为窗口元素注册事件*/
-    var dialogleft = parseInt(dialog.style.left);
-    var dialogtop = parseInt(dialog.style.top);
-    var ismousedown = false;//标志鼠标是否按下
-    /*关闭按钮的事件*/							
-    closeaction.onclick = function()
-    {
-        dialog.parentNode.removeChild(dialog);
-    }
-    /*实现窗口的移动，这段代码很典型，网上很多类似的代码*/
-    if(removeable == true)
-    {
-        var ismousedown = false;
-        var dialogleft,dialogtop;
-        var downX,downY;
-        dialogleft = parseInt(dialog.style.left);
-        dialogtop = parseInt(dialog.style.top);
-        dialogtitlebar.onmousedown = function(e)
-        {
-            ismousedown = true;
-            downX = e.clientX;
-            downY = e.clientY;
-        }
-        document.onmousemove = function(e)
-        {
-            if(ismousedown)
-            {
-                dialog.style.top = e.clientY - downY + dialogtop + "px";
-                dialog.style.left = e.clientX - downX + dialogleft + "px";
-            }
-        }
-        /*松开鼠标时要重新计算当前窗口的位置*/
-        document.onmouseup = function()
-        {
-            dialogleft = parseInt(dialog.style.left);
-            dialogtop = parseInt(dialog.style.top);
-            ismousedown = false;
-        }
-    }
+    
+    
 }
 
 // 创建悬浮对话框
 function createHTML2MardDownDialog()
 {
+    // 控制变量
+    var toolBarHeight = 20;
+    
     // 各个元素
     var bodyContent = document.createElement('div');    // 对话框最外div
     bodyContent.id = 'HTML2MD_Dialog';
+    bodyContent.style.position = "relative";
+    bodyContent.style.width = "100%";
+    bodyContent.style.height = "100%";
     {   // 工具栏
         var divToolBar = document.createElement('div');
         bodyContent.appendChild(divToolBar);
+        divToolBar.style.width = "100%";
+        divToolBar.style.height = toolBarHeight + "px";
         var btnConv = document.createElement('input');      // HTML2MD按钮
         divToolBar.appendChild(btnConv);
         btnConv.type = "button";
@@ -108,7 +167,12 @@ function createHTML2MardDownDialog()
     {   // MarkDown编辑框
         var divMDdEditor = document.createElement('div');
         bodyContent.appendChild(divMDdEditor);
-        divMDdEditor.style = "width: 50%; height: 500px; float: left; border: 1px solid #333; border-right: 0px; box-sizing: border-box;";
+        divMDdEditor.style.position = "absolute";
+        divMDdEditor.style.width = "50%";
+        divMDdEditor.style.top = toolBarHeight + "px";
+        divMDdEditor.style.bottom = "0px";
+        divMDdEditor.style.left = "0px";
+        divMDdEditor.style.border = "1px solid #333";
         var textmdEditor = document.createElement('textarea');
         divMDdEditor.appendChild(textmdEditor);
         textmdEditor.style = "width: 100%; height: 100%; border: 0px; padding: 5px; box-sizing: border-box;";
@@ -117,17 +181,27 @@ function createHTML2MardDownDialog()
     { // html展示框
         var divHTMLDisp = document.createElement('div')
         bodyContent.appendChild(divHTMLDisp);
-        divHTMLDisp.style="width: 50%; height: 500px; float: right; border: 1px solid #333; box-sizing: border-box;";
+        divHTMLDisp.style.position = "absolute";
+        divHTMLDisp.style.width = "50%";
+        divHTMLDisp.style.bottom = "0px"; 
+        divHTMLDisp.style.right = "0px"; 
+        divHTMLDisp.style.top = toolBarHeight + "px";
+        divHTMLDisp.style.border = "1px solid #333";
         var frameHTMLDisp = document.createElement('iframe');
         divHTMLDisp.appendChild(frameHTMLDisp);
         frameHTMLDisp.style="width: 100%; height: 100%; border: 0px; padding: 5px; box-sizing: border-box;";
         frameHTMLDisp.id = "MD2HTML_HTMLFrame";
     }
     // 创建对话框
-    createdialog("Html2MD",400,400,bodyContent,"Html2MD",true);
+    createdialog("Html2MD",200,200,bodyContent,"Html2MD",true);
     
 }
 
+function createTest()
+{
+    var bodyContent = document.createElement("div");
+    createdialog("Html2MD",200,200,bodyContent,"Html2MD",true);
+}
 
 // 选择文本对话框
 function getSelected() 
@@ -234,8 +308,10 @@ function createSelectionContextDialog()
     
 }
 
+
 function HTML2MarkDownMain()
 {
+    //createTest();
     createHTML2MardDownDialog();
     createSelectionContextDialog();
 }
