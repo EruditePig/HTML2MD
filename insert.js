@@ -46,7 +46,7 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     topEdge.style.height = edgeWidth + "px";
     topEdge.style.width = "100%";
     topEdge.style.top = "0px";
-    topEdge.style.background = "red";
+    // topEdge.style.background = "red";
     topEdge.style.zIndex = edgeZIndex;
     topEdge.addEventListener("mousedown", function(e)
     {
@@ -73,9 +73,26 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     leftEdge.style.height = "100%";
     leftEdge.style.width = edgeWidth + "px";
     leftEdge.style.left = "0px";
-    leftEdge.style.background = "black";
+    // leftEdge.style.background = "black";
     leftEdge.style.zIndex = edgeZIndex;
-    
+    leftEdge.addEventListener("mousedown", function(e)
+    {
+        dragObj.state = true;
+        dragObj.para = {"left":parseInt(dialog.style.left), "width":parseInt(dialog.style.width), "x" : e.clientX};
+        dragObj.timerId = setInterval(function()
+        {
+            if(dragObj.state = true)
+            {
+                dialog.style.left = dragObj.nowPt.x - dragObj.para.x + dragObj.para.left + "px";
+                dialog.style.width = dragObj.para.width - (dragObj.nowPt.x - dragObj.para.x) + "px";
+            }
+        }, 10);
+        
+    });
+    leftEdge.addEventListener("mouseover", function(e)
+    {
+        leftEdge.style.cursor = "e-resize";
+    });
     // 右边框
     var rightEdge = document.createElement("div");
     dialog.appendChild(rightEdge);
@@ -83,8 +100,25 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     rightEdge.style.height = "100%";
     rightEdge.style.width = edgeWidth + "px";
     rightEdge.style.right = "0px";
-    rightEdge.style.background = "yellow";
+    // rightEdge.style.background = "yellow";
     rightEdge.style.zIndex = edgeZIndex;
+    rightEdge.addEventListener("mousedown", function(e)
+    {
+        dragObj.state = true;
+        dragObj.para = {"width":parseInt(dialog.style.width), "x" : e.clientX};
+        dragObj.timerId = setInterval(function()
+        {
+            if(dragObj.state = true)
+            {
+                dialog.style.width = dragObj.para.width + (dragObj.nowPt.x - dragObj.para.x) + "px";
+            }
+        }, 10);
+        
+    });
+    rightEdge.addEventListener("mouseover", function(e)
+    {
+        rightEdge.style.cursor = "e-resize";
+    });
     
     // 底边框
     var btmEdge = document.createElement("div");
@@ -93,8 +127,25 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     btmEdge.style.height = edgeWidth + "px";
     btmEdge.style.width = "100%";
     btmEdge.style.bottom = "0px";
-    btmEdge.style.background = "orange";
+    // btmEdge.style.background = "orange";
     btmEdge.style.zIndex = edgeZIndex;
+    btmEdge.addEventListener("mousedown", function(e)
+    {
+        dragObj.state = true;
+        dragObj.para = {"height":parseInt(dialog.style.height), "y" : e.clientY};
+        dragObj.timerId = setInterval(function()
+        {
+            if(dragObj.state = true)
+            {
+                dialog.style.height = dragObj.para.height + (dragObj.nowPt.y - dragObj.para.y) + "px";
+            }
+        }, 10);
+        
+    });
+    btmEdge.addEventListener("mouseover", function(e)
+    {
+        btmEdge.style.cursor = "n-resize";
+    });
     
     /*标题栏*/
     var dialogtitlebar= document.createElement("div");
@@ -157,8 +208,8 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     dialogbody.style.bottom = "0px";
     dialogbody.style.left = "0px";
     dialogbody.style.right = "0px";
-    dialogbody.style.background = "brown";
-    
+    //dialogbody.style.background = "grey";
+    dialogbody.style.border = "1px solid";
     if(bodycontent!=null)
     {
         bodycontent.style.display = "block";
@@ -226,16 +277,9 @@ function createHTML2MardDownDialog()
         frameHTMLDisp.id = "MD2HTML_HTMLFrame";
     }
     // 创建对话框
-    createdialog("Html2MD",200,200,bodyContent,"Html2MD",true);
+    createdialog("Html2MD",300,400,bodyContent,"Html2MD",true);
     
 }
-
-function createTest()
-{
-    var bodyContent = document.createElement("div");
-    createdialog("Html2MD",200,200,bodyContent,"Html2MD",true);
-}
-
 // 选择文本对话框
 function getSelected() 
 {
@@ -344,7 +388,6 @@ function createSelectionContextDialog()
 
 function HTML2MarkDownMain()
 {
-    //createTest();
     createHTML2MardDownDialog();
     createSelectionContextDialog();
 }
