@@ -20,8 +20,8 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     //dialog.style.background = "blue";
     //dialog.style.padding = "1px";
     dialog.style.border = "4px";
-    dialog.style.top = (document.body.clientHeight-height)/2 + "px";
-    dialog.style.left = (document.body.clientWidth-width)/2 + "px";
+    dialog.style.top = (window.innerHeight-height)/2 + "px";
+    dialog.style.left = (window.innerWidth-width)/2 + "px";
     dialog.style.height = height+"px";
     dialog.style.width = width+"px";
     
@@ -30,7 +30,6 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     {
         dragObj.state = false;
         clearInterval(dragObj.timerId);
-        console.log("up", dragObj);
     });
     document.addEventListener("mousemove", function(e)
     {
@@ -208,7 +207,7 @@ function createdialog(dlgID,width,height,bodycontent,title,removeable)
     dialogbody.style.bottom = "0px";
     dialogbody.style.left = "0px";
     dialogbody.style.right = "0px";
-    //dialogbody.style.background = "grey";
+    dialogbody.style.background = "#fff";
     dialogbody.style.border = "1px solid";
     if(bodycontent!=null)
     {
@@ -310,6 +309,9 @@ function createSelectionContextDialog()
         divToolBar.appendChild(selMarkDownType);
         selMarkDownType.style.display = "inline-block";
         selMarkDownType.id = "HTML2MD_TypeSelect"
+        var optMarkDownText = document.createElement('option');
+        selMarkDownType.appendChild(optMarkDownText);
+        optMarkDownText.innerHTML = "text";
         var optMarkDownTitle = document.createElement('option');
         selMarkDownType.appendChild(optMarkDownTitle);
         optMarkDownTitle.innerHTML = "title";
@@ -341,8 +343,14 @@ function createSelectionContextDialog()
             var addMarkDown = function(str)
             {
                 var mdText = document.getElementById("MD2HTML_mdText");
+                var isTabbed = document.getElementById("HTML2MD_IsTabbed");
+                if(isTabbed.checked)
+                {
+                    str = "    " + str.split("\n").join("\n    ");
+                }
                 mdText.value += "\r\n";
                 mdText.value += str;
+                mdText.value += "\r\n";
             };
             var selection = document.getElementById("HTML2MD_TypeSelect");
             var text = document.getElementById("textEdit");
@@ -374,7 +382,19 @@ function createSelectionContextDialog()
             {
                 addMarkDown("1. " + text.value);
             }
+            else if(selection.value == "text")
+            {
+                addMarkDown(text.value);
+            }
         };
+        // 是否缩进的选择
+        var btnIsTabbed = document.createElement('input');
+        divToolBar.appendChild(btnIsTabbed);
+        btnIsTabbed.type = "checkbox";
+        btnIsTabbed.id = "HTML2MD_IsTabbed";
+        var tabText = document.createTextNode("缩进"); // 创建一个文本节点
+        divToolBar.appendChild(tabText);
+        
     }
     {   // 文本编辑
         var textEdit = document.createElement('textarea');
@@ -407,8 +427,8 @@ $(document).on("mouseup", function(e)
             var textEdit = document.getElementById('textEdit');
             textEdit.value = selectedText;
             menu.style.display = 'block';
-            menu.style.left = e.pageX + 5;
-            menu.style.top  = e.pageY + 5;
+            menu.style.left = e.pageX + 5 + 'px';
+            menu.style.top  = e.pageY + 5 + 'px';
         }
     }
 });
@@ -419,8 +439,7 @@ $(document).on("mousedown", function(e)
     var menu = document.getElementById("menu");
     if(menu.style.display == "block")
     {
-        var ele = document.elementFromPoint(e.pageX, e.pageY);
-        if(!$.contains(menu, ele))
+        if(!$.contains(menu, e.target))
         {
             menu.style.display = 'none';
         }
