@@ -235,7 +235,8 @@ function createHTML2MardDownDialog()
         bodyContent.appendChild(divToolBar);
         divToolBar.style.width = "100%";
         divToolBar.style.height = toolBarHeight + "px";
-        var btnConv = document.createElement('input');      // HTML2MD按钮
+        // HTML2MD按钮
+        var btnConv = document.createElement('input');      
         divToolBar.appendChild(btnConv);
         btnConv.type = "button";
         btnConv.value = "Run";
@@ -246,6 +247,41 @@ function createHTML2MardDownDialog()
             var html      = converter.makeHtml(text);
             document.getElementById("MD2HTML_HTMLFrame").srcdoc = html;
         };
+        // 添加图片按钮
+        var btnAddPic = document.createElement('input');
+        divToolBar.appendChild(btnAddPic);
+        btnAddPic.type = "button";
+        btnAddPic.value = "Img";
+        btnAddPic.style.float = "right";
+        btnAddPic.onclick = function()
+        {
+        	var eleText = document.getElementById("MD2HTML_mdText");
+        	var eleCheckTab = document.getElementById("MD2HTML_checkTab");
+        	if(eleCheckTab.checked)
+        	{
+        		eleText.value += "    \r\n";
+        		eleText.value += "    ![]()";
+        		eleText.value += "    \r\n";
+        	}
+        	else
+        	{
+        		eleText.value += "\r\n";
+        		eleText.value += "![]()";
+        		eleText.value += "\r\n";
+        	}
+        };
+        // 是否缩进
+        var textTab = document.createElement("label");        
+        divToolBar.appendChild(textTab);
+        textTab.innerHTML = "缩进";
+        textTab.style.float = "right";
+        textTab.htmlFor  = "MD2HTML_checkTab";
+        var checkTab = document.createElement("input");
+        divToolBar.appendChild(checkTab);
+        checkTab.type = "checkbox";
+        checkTab.id = "MD2HTML_checkTab"
+        checkTab.style.float = "right";
+        
     }
     {   // MarkDown编辑框
         var divMDdEditor = document.createElement('div');
